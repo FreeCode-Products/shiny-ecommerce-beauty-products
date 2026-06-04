@@ -44,6 +44,7 @@ export function Footer() {
               </span>
               <span className="font-display text-2xl font-semibold">Saponé</span>
             </Link>
+            <p className="mt-1 text-xs text-foam/50">A soap company by Shiny</p>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-foam/70">
               Small-batch botanical soap, hand-cut and cured for six weeks in our
               workshop. Kind to skin, kinder to the planet.
