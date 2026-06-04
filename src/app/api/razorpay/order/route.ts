@@ -17,9 +17,33 @@ interface IncomingItem {
   quantity: number;
 }
 
+interface Shipping {
+  name?: string;
+  phone?: string;
+  line1?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+}
+
+function validShipping(s: Shipping | undefined): string | null {
+  if (!s) return "Missing delivery details.";
+  if (!s.name?.trim()) return "Name is required.";
+  if (!/^[0-9]{10}$/.test((s.phone ?? "").trim())) return "Valid 10-digit mobile required.";
+  if (!s.line1?.trim()) return "Address is required.";
+  if (!s.city?.trim()) return "City is required.";
+  if (!s.state?.trim()) return "State is required.";
+  if (!/^[0-9]{6}$/.test((s.pincode ?? "").trim())) return "Valid 6-digit pincode required.";
+  return null;
+}
+
 export async function POST(request: NextRequest) {
-  if (!isRazorpayConfigured) {
-    return NextResponse.json({ error: "Payments are not configured yet." }, { status: 503 });
+  const supabase = await createSupabaseServerClient();
+
+  // Pure demo (no Supabase + no Razorpay): nothing to persist — let the client
+  // show a demo confirmation.
+  if (!supabase && !isRazorpayConfigured) {
+    return NextResponse.json({ mode: "demo" }, { status: 503 });
   }
 
   const user = await getCurrentUser();
@@ -27,13 +51,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Please log in to check out." }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => null)) as { items?: IncomingItem[] } | null;
+  const body = (await request.json().catch(() => null)) as
+    | { items?: IncomingItem[]; shipping?: Shipping }
+    | null;
+
   const incoming = body?.items;
   if (!Array.isArray(incoming) || incoming.length === 0) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
   }
 
-  // Recompute totals server-side from the trusted catalogue (never trust the client).
+  const shipErr = validShipping(body?.shipping);
+  if (shipErr) {
+    return NextResponse.json({ error: shipErr }, { status: 400 });
+  }
+  const ship = body!.shipping!;
+
+  // Recompute totals server-side from the trusted catalogue.
   let subtotal = 0;
   const snapshot: { slug: string; name: string; price: number; quantity: number }[] = [];
   for (const item of incoming) {
@@ -43,56 +76,77 @@ export async function POST(request: NextRequest) {
     subtotal += product.price * quantity;
     snapshot.push({ slug: product.slug, name: product.name, price: product.price, quantity });
   }
-
   if (snapshot.length === 0) {
     return NextResponse.json({ error: "No valid items in cart." }, { status: 400 });
   }
 
-  const shipping = subtotal >= FREE_SHIP_AT ? 0 : SHIP_COST;
-  const total = subtotal + shipping;
-  const amount = Math.round(total * 100); // paise
+  const shippingCost = subtotal >= FREE_SHIP_AT ? 0 : SHIP_COST;
+  const total = subtotal + shippingCost;
 
-  const razorpay = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
+  const shipping_address = {
+    name: ship.name!.trim(),
+    line1: ship.line1!.trim(),
+    city: ship.city!.trim(),
+    state: ship.state!.trim(),
+    pincode: ship.pincode!.trim(),
+  };
 
-  let rzpOrderId: string;
-  try {
-    const rzpOrder = await razorpay.orders.create({
-      amount,
-      currency: "INR",
-      receipt: `sapone_${Date.now()}`,
-    });
-    rzpOrderId = rzpOrder.id;
-  } catch {
-    return NextResponse.json({ error: "Could not start payment." }, { status: 502 });
-  }
-
-  // Persist a pending order (best-effort; payment still works without Supabase).
-  let dbOrderId: string | null = null;
-  const supabase = await createSupabaseServerClient();
-  if (supabase) {
-    const { data } = await supabase
-      .from("orders")
-      .insert({
-        user_id: user.id,
-        email: user.email,
-        items: snapshot,
-        subtotal,
-        shipping,
-        total,
-        currency: "INR",
-        status: "created",
-        razorpay_order_id: rzpOrderId,
-      })
-      .select("id")
-      .single();
-    dbOrderId = (data?.id as string) ?? null;
-  }
-
-  return NextResponse.json({
-    orderId: rzpOrderId,
-    amount,
+  const baseOrder = {
+    user_id: user.id,
+    email: user.email,
+    phone: ship.phone!.trim(),
+    shipping_address,
+    items: snapshot,
+    subtotal,
+    shipping: shippingCost,
+    total,
     currency: "INR",
-    keyId: RAZORPAY_KEY_ID,
-    dbOrderId,
-  });
+  };
+
+  // --- Razorpay path -------------------------------------------------------
+  if (isRazorpayConfigured) {
+    const razorpay = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
+    let rzpOrderId: string;
+    try {
+      const rzpOrder = await razorpay.orders.create({
+        amount: Math.round(total * 100),
+        currency: "INR",
+        receipt: `sapone_${Date.now()}`,
+      });
+      rzpOrderId = rzpOrder.id;
+    } catch {
+      return NextResponse.json({ error: "Could not start payment." }, { status: 502 });
+    }
+
+    let dbOrderId: string | null = null;
+    if (supabase) {
+      const { data } = await supabase
+        .from("orders")
+        .insert({ ...baseOrder, status: "created", razorpay_order_id: rzpOrderId })
+        .select("id")
+        .single();
+      dbOrderId = (data?.id as string) ?? null;
+    }
+
+    return NextResponse.json({
+      mode: "razorpay",
+      orderId: rzpOrderId,
+      amount: Math.round(total * 100),
+      currency: "INR",
+      keyId: RAZORPAY_KEY_ID,
+      dbOrderId,
+      prefill: { name: shipping_address.name, contact: baseOrder.phone, email: user.email },
+    });
+  }
+
+  // --- Cash on delivery path (Razorpay not configured yet) -----------------
+  const { error } = await supabase!
+    .from("orders")
+    .insert({ ...baseOrder, status: "created" });
+
+  if (error) {
+    return NextResponse.json({ error: "Could not place order." }, { status: 500 });
+  }
+
+  return NextResponse.json({ mode: "cod" });
 }

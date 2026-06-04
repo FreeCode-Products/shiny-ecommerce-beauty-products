@@ -69,7 +69,9 @@ export default async function AdminPage() {
 
   const { data } = await admin
     .from("orders")
-    .select("id, email, user_id, items, subtotal, shipping, total, status, created_at")
+    .select(
+      "id, email, phone, shipping_address, user_id, items, subtotal, shipping, total, status, created_at"
+    )
     .order("created_at", { ascending: false });
 
   const orders = (data as AdminOrder[] | null) ?? [];

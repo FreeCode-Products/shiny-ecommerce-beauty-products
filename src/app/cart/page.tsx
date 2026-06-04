@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { SoapVisual } from "@/components/ui/SoapVisual";
 import { Button } from "@/components/ui/Button";
 import { CheckoutButton } from "@/components/CheckoutButton";
+import { DeliveryForm, emptyDelivery, type Delivery } from "@/components/checkout/DeliveryForm";
 import { formatPrice } from "@/lib/utils";
 
 const FREE_SHIP_AT = 999;
@@ -16,6 +17,7 @@ const SHIP_COST = 59;
 export default function CartPage() {
   const { items, subtotal, updateQuantity, removeItem, clear, count } = useCart();
   const [placed, setPlaced] = useState(false);
+  const [delivery, setDelivery] = useState<Delivery>(emptyDelivery);
 
   const shipping = subtotal >= FREE_SHIP_AT || subtotal === 0 ? 0 : SHIP_COST;
   const total = subtotal + shipping;
@@ -142,6 +144,10 @@ export default function CartPage() {
                 ))}
               </AnimatePresence>
             </ul>
+
+            <div className="mt-8">
+              <DeliveryForm value={delivery} onChange={setDelivery} />
+            </div>
           </div>
 
           {/* Summary */}
@@ -171,6 +177,7 @@ export default function CartPage() {
 
             <div className="mt-6">
               <CheckoutButton
+                delivery={delivery}
                 onSuccess={() => {
                   clear();
                   setPlaced(true);
@@ -178,8 +185,8 @@ export default function CartPage() {
               />
             </div>
             <p className="mt-3 text-center text-xs text-ink-soft">
-              Secure checkout via Razorpay (test mode). Runs as a demo if payments
-              aren&apos;t configured yet.
+              Pay online via Razorpay (test mode), or cash on delivery if payments
+              aren&apos;t set up yet.
             </p>
           </aside>
         </div>

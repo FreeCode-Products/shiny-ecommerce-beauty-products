@@ -9,6 +9,14 @@ import { formatPrice } from "@/lib/utils";
 export interface AdminOrder {
   id: string;
   email: string | null;
+  phone: string | null;
+  shipping_address: {
+    name?: string;
+    line1?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+  } | null;
   user_id: string;
   items: { slug: string; name: string; price: number; quantity: number }[];
   subtotal: number;
@@ -120,11 +128,12 @@ export function AdminDashboard({
           <p className="mt-4 text-ink-soft">No orders yet.</p>
         ) : (
           <div className="mt-5 overflow-x-auto rounded-3xl border border-ink/10 bg-foam">
-            <table className="w-full min-w-[720px] text-left text-sm">
+            <table className="w-full min-w-[900px] text-left text-sm">
               <thead className="border-b border-ink/10 text-ink-soft">
                 <tr>
                   <th className="px-5 py-4 font-medium">Date</th>
                   <th className="px-5 py-4 font-medium">Customer</th>
+                  <th className="px-5 py-4 font-medium">Deliver to</th>
                   <th className="px-5 py-4 font-medium">Items</th>
                   <th className="px-5 py-4 font-medium">Total</th>
                   <th className="px-5 py-4 font-medium">Status</th>
@@ -140,7 +149,21 @@ export function AdminDashboard({
                         year: "numeric",
                       })}
                     </td>
-                    <td className="px-5 py-4 text-ink">{o.email ?? o.user_id.slice(0, 8)}</td>
+                    <td className="px-5 py-4">
+                      <p className="text-ink">{o.shipping_address?.name ?? o.email ?? o.user_id.slice(0, 8)}</p>
+                      {o.phone && <p className="text-xs text-ink-soft">📞 {o.phone}</p>}
+                      {o.email && <p className="text-xs text-ink-soft">{o.email}</p>}
+                    </td>
+                    <td className="px-5 py-4 text-ink-soft">
+                      {o.shipping_address ? (
+                        <span className="block max-w-[200px]">
+                          {o.shipping_address.line1}, {o.shipping_address.city},{" "}
+                          {o.shipping_address.state} {o.shipping_address.pincode}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                     <td className="px-5 py-4 text-ink-soft">
                       {(o.items ?? [])
                         .map((i) => `${i.name} ×${i.quantity}`)
