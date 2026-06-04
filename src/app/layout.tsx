@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import SmoothScroll from "@/components/SmoothScroll";
 import { Navbar } from "@/components/Navbar";
@@ -57,14 +58,16 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
     >
       <body className="flex min-h-screen flex-col">
-        <CartProvider>
-          <SmoothScroll>
-            <Navbar />
-            <CartDrawer />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </SmoothScroll>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <SmoothScroll>
+              <Navbar />
+              <CartDrawer />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </SmoothScroll>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

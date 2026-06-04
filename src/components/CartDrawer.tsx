@@ -7,7 +7,7 @@ import { SoapVisual } from "@/components/ui/SoapVisual";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils";
 
-const FREE_SHIP_AT = 45;
+const FREE_SHIP_AT = 999;
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal, count } = useCart();

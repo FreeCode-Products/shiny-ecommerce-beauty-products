@@ -6,6 +6,7 @@ import { getProduct, products } from "@/data/products";
 import { SoapVisual } from "@/components/ui/SoapVisual";
 import { AddToCart } from "@/components/AddToCart";
 import { ProductCard } from "@/components/ProductCard";
+import { Reviews } from "@/components/Reviews";
 import { formatPrice } from "@/lib/utils";
 
 export function generateStaticParams() {
@@ -153,6 +154,9 @@ export default async function ProductPage({
             </div>
           </div>
         </div>
+
+        {/* Reviews */}
+        <Reviews productSlug={product.slug} />
 
         {/* Related */}
         <section className="mt-24 pb-24">

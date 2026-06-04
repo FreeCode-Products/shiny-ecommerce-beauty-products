@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, ShoppingBag, X } from "lucide-react";
+import { Menu, ShoppingBag, User, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -16,6 +17,7 @@ const links = [
 
 export function Navbar() {
   const { count, openCart } = useCart();
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -62,6 +64,16 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <Link
+            href={user ? "/account" : "/login"}
+            aria-label={user ? "Your account" : "Log in"}
+            className="relative grid size-11 place-items-center rounded-full bg-ink/5 text-ink transition-colors hover:bg-ink/10"
+          >
+            <User className="size-5" />
+            {user && (
+              <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-sage ring-2 ring-cream" />
+            )}
+          </Link>
           <button
             onClick={openCart}
             aria-label="Open cart"

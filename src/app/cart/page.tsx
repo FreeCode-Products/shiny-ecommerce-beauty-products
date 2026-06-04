@@ -7,10 +7,11 @@ import { ArrowLeft, Check, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { SoapVisual } from "@/components/ui/SoapVisual";
 import { Button } from "@/components/ui/Button";
+import { CheckoutButton } from "@/components/CheckoutButton";
 import { formatPrice } from "@/lib/utils";
 
-const FREE_SHIP_AT = 45;
-const SHIP_COST = 5;
+const FREE_SHIP_AT = 999;
+const SHIP_COST = 59;
 
 export default function CartPage() {
   const { items, subtotal, updateQuantity, removeItem, clear, count } = useCart();
@@ -168,11 +169,17 @@ export default function CartPage() {
               </div>
             </dl>
 
-            <Button onClick={() => setPlaced(true)} size="lg" className="mt-6 w-full">
-              Place order
-            </Button>
+            <div className="mt-6">
+              <CheckoutButton
+                onSuccess={() => {
+                  clear();
+                  setPlaced(true);
+                }}
+              />
+            </div>
             <p className="mt-3 text-center text-xs text-ink-soft">
-              Demo checkout — no payment is processed.
+              Secure checkout via Razorpay (test mode). Runs as a demo if payments
+              aren&apos;t configured yet.
             </p>
           </aside>
         </div>
