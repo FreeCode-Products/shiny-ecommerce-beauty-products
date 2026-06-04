@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { products, categories, type ProductCategory } from "@/data/products";
+import { categories, type Product, type ProductCategory } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,13 @@ const sorts: { key: Sort; label: string }[] = [
   { key: "rating", label: "Top rated" },
 ];
 
-export function ShopClient({ initialCategory }: { initialCategory?: string }) {
+export function ShopClient({
+  initialCategory,
+  products,
+}: {
+  initialCategory?: string;
+  products: Product[];
+}) {
   const validInitial = categories.some((c) => c.key === initialCategory)
     ? (initialCategory as ProductCategory)
     : "All";
@@ -31,7 +37,7 @@ export function ShopClient({ initialCategory }: { initialCategory?: string }) {
     if (sort === "price-desc") list.sort((a, b) => b.price - a.price);
     if (sort === "rating") list.sort((a, b) => b.rating - a.rating);
     return list;
-  }, [filter, sort]);
+  }, [filter, sort, products]);
 
   const filters: Filter[] = ["All", ...categories.map((c) => c.key)];
 

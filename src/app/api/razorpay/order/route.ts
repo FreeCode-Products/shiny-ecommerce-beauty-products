@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import Razorpay from "razorpay";
-import { products } from "@/data/products";
+import { getAllProducts } from "@/lib/products";
 import { createSupabaseServerClient, getCurrentUser } from "@/lib/supabase/server";
 import {
   FREE_SHIP_AT,
@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
   }
   const ship = body!.shipping!;
 
-  // Recompute totals server-side from the trusted catalogue.
+  // Recompute totals server-side from the trusted catalogue (DB or fallback).
+  const products = await getAllProducts();
   let subtotal = 0;
   const snapshot: { slug: string; name: string; price: number; quantity: number }[] = [];
   for (const item of incoming) {

@@ -19,6 +19,9 @@ export interface Product {
   ingredients: string[];
   benefits: string[];
   description: string;
+  /** Admin-managed (present on DB-backed products). */
+  featured?: boolean;
+  sortOrder?: number;
 }
 
 export const categories: {

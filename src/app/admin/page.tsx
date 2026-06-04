@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldAlert } from "lucide-react";
-import { products } from "@/data/products";
+import { getAllProducts } from "@/lib/products";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isAdminEmail } from "@/lib/admin";
 import { AdminDashboard, type AdminOrder } from "@/components/admin/AdminDashboard";
+import { ProductsManager } from "@/components/admin/ProductsManager";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
@@ -75,6 +76,7 @@ export default async function AdminPage() {
     .order("created_at", { ascending: false });
 
   const orders = (data as AdminOrder[] | null) ?? [];
+  const products = await getAllProducts();
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-32 sm:pt-40">
@@ -95,6 +97,7 @@ export default async function AdminPage() {
       </header>
 
       <AdminDashboard initialOrders={orders} products={products} />
+      <ProductsManager initialProducts={products} />
     </div>
   );
 }

@@ -1,10 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { featured } from "@/data/products";
+import { getFeaturedProducts } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function FeaturedProducts() {
+export async function FeaturedProducts() {
+  const featured = await getFeaturedProducts();
+
   return (
     <section id="bestsellers" className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
       <div className="flex flex-wrap items-end justify-between gap-6">

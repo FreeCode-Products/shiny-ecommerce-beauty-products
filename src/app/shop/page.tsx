@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ShopClient } from "@/components/ShopClient";
+import { getAllProducts } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Shop all soaps",
@@ -7,12 +8,15 @@ export const metadata: Metadata = {
     "Browse the full Saponé collection of handmade botanical soap bars — detox, calm, energize and nourish.",
 };
 
+export const revalidate = 60;
+
 export default async function ShopPage({
   searchParams,
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
+  const products = await getAllProducts();
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-32 sm:pt-40">
@@ -30,7 +34,7 @@ export default async function ShopPage({
       </header>
 
       <div className="mt-12">
-        <ShopClient initialCategory={category} />
+        <ShopClient initialCategory={category} products={products} />
       </div>
     </div>
   );

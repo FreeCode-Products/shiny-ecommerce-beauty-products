@@ -7,6 +7,9 @@ import { Story } from "@/components/sections/Story";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Newsletter } from "@/components/sections/Newsletter";
 
+// Re-fetch DB-backed products at most once a minute (ISR).
+export const revalidate = 60;
+
 export default function Home() {
   return (
     <>

@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, Leaf, Recycle, Star, Truck } from "lucide-react";
-import { getProduct, products } from "@/data/products";
+import { getAllProducts, getProductBySlug } from "@/lib/products";
 import { SoapVisual } from "@/components/ui/SoapVisual";
 import { AddToCart } from "@/components/AddToCart";
 import { ProductCard } from "@/components/ProductCard";
 import { Reviews } from "@/components/Reviews";
 import { formatPrice } from "@/lib/utils";
 
-export function generateStaticParams() {
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const products = await getAllProducts();
   return products.map((p) => ({ slug: p.slug }));
 }
 
@@ -19,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "Not found" };
   return {
     title: product.name,
@@ -28,7 +31,7 @@ export async function generateMetadata({
 }
 
 const perks = [
-  { icon: Truck, label: "Free shipping over $45" },
+  { icon: Truck, label: "Free shipping over ₹999" },
   { icon: Leaf, label: "100% vegan ingredients" },
   { icon: Recycle, label: "Plastic-free packaging" },
 ];
@@ -39,10 +42,10 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = products.filter((p) => p.id !== product.id).slice(0, 4);
+  const related = (await getAllProducts()).filter((p) => p.id !== product.id).slice(0, 4);
 
   return (
     <article className="pt-28">
