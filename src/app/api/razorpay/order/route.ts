@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
       .from("orders")
       .insert({
         user_id: user.id,
+        email: user.email,
         items: snapshot,
         subtotal,
         shipping,

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Package, ShoppingBag } from "lucide-react";
+import { LayoutDashboard, LogOut, Package, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
+import { isAdminEmail } from "@/lib/admin";
 import { formatPrice } from "@/lib/utils";
 
 interface OrderRow {
@@ -62,15 +63,22 @@ export default function AccountPage() {
           </h1>
           <p className="mt-1 text-ink-soft">{user.email}</p>
         </div>
-        <Button
-          variant="outline"
-          onClick={async () => {
-            await signOut();
-            router.replace("/");
-          }}
-        >
-          <LogOut className="size-4" /> Log out
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          {isAdminEmail(user.email) && (
+            <Button href="/admin" variant="secondary">
+              <LayoutDashboard className="size-4" /> Admin
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await signOut();
+              router.replace("/");
+            }}
+          >
+            <LogOut className="size-4" /> Log out
+          </Button>
+        </div>
       </div>
 
       <section className="mt-12">

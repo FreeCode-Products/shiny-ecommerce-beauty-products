@@ -27,6 +27,18 @@ cp .env.example .env.local
 
 That's it — sign-up/login, the account page, and product reviews now work.
 
+### Admin dashboard (`/admin`)
+To manage orders at **/admin**, add two more values to `.env.local`:
+- `NEXT_PUBLIC_ADMIN_EMAILS` — your account email (comma-separate several).
+- `SUPABASE_SERVICE_ROLE_KEY` — **Project Settings → API Keys → `service_role`**
+  secret. This is **server-only** and powerful (bypasses Row Level Security) —
+  never commit it or expose it to the browser.
+
+Then sign up/in with that email and open **/admin** (a link also appears on your
+account page). You can view every order, change order status, and see per-product
+sales. *(The product catalogue lives in `src/data/products.ts`; ask to make it
+database-editable if you want full product CRUD.)*
+
 ---
 
 ## 2. Razorpay — payments (free **test mode**)
