@@ -11,9 +11,11 @@ import { deliveryError, type Delivery } from "@/components/checkout/DeliveryForm
 export function CheckoutButton({
   delivery,
   onSuccess,
+  onInvalid,
 }: {
   delivery: Delivery;
   onSuccess: () => void;
+  onInvalid?: () => void;
 }) {
   const { items } = useCart();
   const { user } = useAuth();
@@ -28,6 +30,7 @@ export function CheckoutButton({
     const dErr = deliveryError(delivery);
     if (dErr) {
       setError(dErr);
+      onInvalid?.();
       return;
     }
 

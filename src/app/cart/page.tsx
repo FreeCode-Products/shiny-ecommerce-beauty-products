@@ -8,7 +8,13 @@ import { useCart } from "@/context/CartContext";
 import { SoapVisual } from "@/components/ui/SoapVisual";
 import { Button } from "@/components/ui/Button";
 import { CheckoutButton } from "@/components/CheckoutButton";
-import { DeliveryForm, emptyDelivery, type Delivery } from "@/components/checkout/DeliveryForm";
+import { smoothScrollTo } from "@/lib/lenis";
+import {
+  DeliveryForm,
+  emptyDelivery,
+  firstInvalidFieldId,
+  type Delivery,
+} from "@/components/checkout/DeliveryForm";
 import { formatPrice } from "@/lib/utils";
 
 const FREE_SHIP_AT = 999;
@@ -18,6 +24,22 @@ export default function CartPage() {
   const { items, subtotal, updateQuantity, removeItem, clear, count } = useCart();
   const [placed, setPlaced] = useState(false);
   const [delivery, setDelivery] = useState<Delivery>(emptyDelivery);
+  const [showErrors, setShowErrors] = useState(false);
+
+  // When checkout is attempted with missing details: reveal inline errors,
+  // smooth-scroll to the form, and focus the first empty field.
+  function handleInvalidDelivery() {
+    setShowErrors(true);
+    const el = document.getElementById("delivery-details");
+    if (el) smoothScrollTo(el);
+    const fieldId = firstInvalidFieldId(delivery);
+    if (fieldId) {
+      window.setTimeout(
+        () => document.getElementById(fieldId)?.focus({ preventScroll: true }),
+        650
+      );
+    }
+  }
 
   const shipping = subtotal >= FREE_SHIP_AT || subtotal === 0 ? 0 : SHIP_COST;
   const total = subtotal + shipping;
@@ -146,7 +168,11 @@ export default function CartPage() {
             </ul>
 
             <div className="mt-8">
-              <DeliveryForm value={delivery} onChange={setDelivery} />
+              <DeliveryForm
+                value={delivery}
+                onChange={setDelivery}
+                showErrors={showErrors}
+              />
             </div>
           </div>
 
@@ -178,6 +204,7 @@ export default function CartPage() {
             <div className="mt-6">
               <CheckoutButton
                 delivery={delivery}
+                onInvalid={handleInvalidDelivery}
                 onSuccess={() => {
                   clear();
                   setPlaced(true);

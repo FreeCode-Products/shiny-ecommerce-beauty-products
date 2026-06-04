@@ -1,0 +1,34 @@
+name: Auto-merge Claude PRs
+
+# When CI succeeds on a PR from a `claude/*` branch (i.e. one Claude opened from
+# an issue), squash-merge it automatically. The green CI run is the safety gate,
+# and the merge to main triggers Vercel's production deploy.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  auto-merge:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      startsWith(github.event.workflow_run.head_branch, 'claude/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Squash-merge the passing Claude PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          PR=$(gh pr list --repo "$REPO" --head "$BRANCH" --state open --json number -q '.[0].number')
+          if [ -n "$PR" ]; then
+            echo "Auto-merging PR #$PR from $BRANCH"
+            gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
+          else
+            echo "No open PR for $BRANCH — nothing to merge."
+          fi
