@@ -3,8 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, Loader2, Mail } from "lucide-react";
+import { AlertCircle, Loader2, Mail, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+
+// Optional one-click demo account (set NEXT_PUBLIC_DEMO_EMAIL/PASSWORD to enable).
+const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL;
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD;
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const isSignup = mode === "signup";
@@ -19,11 +23,29 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [demoBusy, setDemoBusy] = useState(false);
+
+  const demoEnabled = Boolean(configured && DEMO_EMAIL && DEMO_PASSWORD);
 
   // Redirect away once authenticated.
   useEffect(() => {
     if (user) router.replace(redirect);
   }, [user, redirect, router]);
+
+  async function handleDemo() {
+    if (!DEMO_EMAIL || !DEMO_PASSWORD) return;
+    setError(null);
+    setInfo(null);
+    setDemoBusy(true);
+    const result = await signIn(DEMO_EMAIL, DEMO_PASSWORD);
+    setDemoBusy(false);
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+    router.replace(redirect);
+    router.refresh();
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -125,6 +147,30 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             {isSignup ? "Create account" : "Log in"}
           </button>
         </form>
+
+        {demoEnabled && (
+          <>
+            <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-ink-soft/70">
+              <span className="h-px flex-1 bg-ink/10" /> or <span className="h-px flex-1 bg-ink/10" />
+            </div>
+            <button
+              type="button"
+              onClick={handleDemo}
+              disabled={demoBusy}
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-ink/20 font-medium text-ink transition-all hover:border-ink/50 hover:bg-ink/5 disabled:opacity-60"
+            >
+              {demoBusy ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Sparkles className="size-4 text-clay" />
+              )}
+              Skip sign-up — explore the demo
+            </button>
+            <p className="mt-2 text-center text-xs text-ink-soft">
+              Instantly browse as a sample shopper. No account needed.
+            </p>
+          </>
+        )}
 
         <p className="mt-6 text-center text-sm text-ink-soft">
           {isSignup ? "Already have an account? " : "New to Saponé? "}
