@@ -1,14 +1,16 @@
 name: Claude
 
-# Mention "@claude" in an issue or PR comment (or a new issue) and Claude will
-# implement the change and open / update a pull request.
+# Follow-up / iteration: mention "@claude" in a comment on an issue or PR (or in
+# a PR review) and Claude will pick up the request and update the pull request.
+#
+# Newly OPENED issues are handled automatically by `claude-auto.yml` (no mention
+# needed), so this workflow intentionally does NOT trigger on `issues` — that
+# avoids a double run when a new issue also happens to contain "@claude".
 on:
   issue_comment:
     types: [created]
   pull_request_review_comment:
     types: [created]
-  issues:
-    types: [opened, assigned]
   pull_request_review:
     types: [submitted]
 
@@ -17,8 +19,7 @@ jobs:
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
     runs-on: ubuntu-latest
     permissions:
       contents: write

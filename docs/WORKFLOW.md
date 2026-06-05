@@ -10,12 +10,15 @@ GitHub issue  →  PR on a claude/* branch  →  CI (lint + build)  →  squash-
 
 ## 1. Requesting a change (issue-driven)
 
-1. Open a **GitHub issue** describing what you want changed.
-2. Mention **`@claude`** in the issue title/body (or comment `@claude` on an
-   existing issue or PR). This triggers [`.github/workflows/claude.yml`](../.github/workflows/claude.yml).
-3. Claude implements the change on a `claude/*` branch and opens a pull request.
+**Just open a GitHub issue** describing what you want changed — that's the only
+step. [`.github/workflows/claude-auto.yml`](../.github/workflows/claude-auto.yml)
+fires on every newly opened issue (no `@claude` mention needed), implements the
+change on a `claude/*` branch and opens a pull request.
 
-You can keep iterating by commenting `@claude <follow-up>` on the PR.
+- To iterate on the result, comment **`@claude <follow-up>`** on the PR or issue
+  — handled by [`.github/workflows/claude.yml`](../.github/workflows/claude.yml).
+- To make the auto-implement selective instead of "every issue," add a label gate
+  to `claude-auto.yml` (a one-line `if:` — see the comment in that file).
 
 ## 2. Continuous integration
 
@@ -72,6 +75,40 @@ So nothing reaches production unverified, enable branch protection on `main`
 
 - Require the **CI** status check to pass before merging.
 - Require pull requests before merging (allow the auto-merge workflow to satisfy it).
+
+## What still needs you (and what can't go in the workflow)
+
+Most work — code, components, styling, copy, and the bundled product catalogue
+(`src/data/products.ts`) — is fully hands-off: open an issue → it ships. The
+items below are the exceptions.
+
+| Task | Auto today? | Can it be automated? |
+| --- | --- | --- |
+| Code / UI / copy / config changes | ✅ Yes | Already automated |
+| Bundled catalogue (`src/data/products.ts`) | ✅ Yes | Already automated |
+| **DB schema change** (Supabase tables, columns, RLS) | ❌ Manual — paste SQL from `supabase/` into the Supabase **SQL Editor** | ⚠️ Yes, via an opt-in migrations runner (see below) — has real risk |
+| **New secret / env var** (API key, etc.) | ❌ Manual — add in **Vercel → Settings → Env Vars** (and GitHub secret if CI needs it) | 🚫 No — provisioning prod secrets shouldn't be automated |
+| **DB row data / seeding** (DB-backed products, etc.) | ❌ Manual — `/admin` or SQL | ⚠️ Partly — a seed step could run on deploy |
+| **Provider dashboard settings** (Supabase Auth redirect URLs, Razorpay test→live, custom domain/DNS) | ❌ Manual, one-time | 🚫 No — lives in third-party dashboards |
+| **Correctness / does it actually work** | ⚠️ CI only checks `lint` + `build` | ⚠️ Add tests / a smoke test to CI to raise confidence |
+
+### Automating DB schema changes (optional, opt-in)
+
+Schema changes are the one piece of "real" work that recurs. They can be moved
+into the pipeline, but auto-applying DDL to a **production** database without
+review is genuinely risky (a bad migration can lock or drop data). If you want it:
+
+1. Keep versioned migrations as `supabase/migrations/*.sql` (Claude writes these
+   in the PR).
+2. Add one secret — `SUPABASE_DB_URL` (the project's Postgres connection string)
+   — in GitHub.
+3. Add a job that runs on push to `main` and applies pending migrations (Supabase
+   CLI `supabase db push`, or `psql -f`).
+
+Trade-off: with that in place, a schema-changing issue ships end-to-end with no
+manual step — at the cost of unreviewed production DDL. Ask and I'll set it up,
+with additive-only migrations recommended. **Until then, schema changes are the
+one thing you apply by hand** (the PR will call out the exact SQL to run).
 
 ## Product content
 

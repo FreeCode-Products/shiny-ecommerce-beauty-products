@@ -1,0 +1,48 @@
+name: Claude — implement issue
+
+# Every newly opened issue is implemented automatically — NO "@claude" mention
+# needed. Claude reads the issue, makes the change on a `claude/*` branch and
+# opens a pull request. From there CI gates it, auto-merge squash-merges it into
+# main, and Vercel deploys. So: open an issue → it ships.
+#
+# To be selective instead, add a label gate to the job, e.g.:
+#   if: contains(github.event.issue.labels.*.name, 'build')
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Implement the issue and open a PR
+        uses: anthropics/claude-code-action@v1
+        with:
+          # Same credential the mention-based workflow uses.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Tag mode + tracking comment, tied to this issue's context.
+          track_progress: true
+          prompt: |
+            Implement the change described in this GitHub issue, then open a pull
+            request that closes it.
+
+            Guidelines:
+            - Keep the change focused on exactly what the issue asks for.
+            - Follow the repo conventions (see AGENTS.md / CLAUDE.md).
+            - The PR must pass `npm run lint` and `npm run build` — that green CI
+              run is the gate that auto-merges the PR to main and deploys it.
+            - If the change requires a Supabase (database) schema change, add the
+              SQL to the `supabase/` folder AND state prominently at the TOP of the
+              PR description that a schema change must be applied, including the
+              exact SQL. Database schema changes are NOT applied automatically.
