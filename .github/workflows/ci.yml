@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: Lint & build
+    name: Lint, build & smoke test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,3 +37,25 @@ jobs:
         # Builds with no secrets — the app degrades gracefully when env vars
         # are absent, so CI verifies the build without exposing any keys.
         run: npm run build
+
+      - name: Smoke test (boot app, check key pages render)
+        # Catches changes that compile but crash at runtime: boots the production
+        # server and asserts the main pages return HTTP 200. Runs in demo mode
+        # (no secrets), so it exercises the bundled-catalogue fallback paths.
+        run: |
+          set -uo pipefail
+          npm run start &
+          SERVER_PID=$!
+          # Wait for the server to accept connections (up to ~60s).
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://localhost:3000/ && break
+            sleep 2
+          done
+          fail=0
+          for path in / /shop /product/midnight-detox; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000$path")
+            echo "$path -> $code"
+            [ "$code" = "200" ] || { echo "::error::$path returned $code"; fail=1; }
+          done
+          kill "$SERVER_PID" 2>/dev/null || true
+          exit $fail

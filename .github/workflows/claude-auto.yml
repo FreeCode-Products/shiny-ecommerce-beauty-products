@@ -40,9 +40,15 @@ jobs:
             Guidelines:
             - Keep the change focused on exactly what the issue asks for.
             - Follow the repo conventions (see AGENTS.md / CLAUDE.md).
-            - The PR must pass `npm run lint` and `npm run build` — that green CI
-              run is the gate that auto-merges the PR to main and deploys it.
-            - If the change requires a Supabase (database) schema change, add the
-              SQL to the `supabase/` folder AND state prominently at the TOP of the
-              PR description that a schema change must be applied, including the
-              exact SQL. Database schema changes are NOT applied automatically.
+            - The PR must pass CI (`npm run lint`, `npm run build`, and the page
+              smoke test) — that green CI run is the gate that auto-merges the PR
+              to main and deploys it.
+            - If the change requires a Supabase (database) schema change, add it as
+              a NEW migration file `supabase/migrations/<UTC-date>_<desc>.sql`
+              (e.g. `20260605_add_orders_note.sql`). It is applied to production
+              automatically on merge, so it MUST be idempotent and additive-only:
+              use `IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS` / `CREATE OR REPLACE`
+              / `DROP POLICY IF EXISTS` then `CREATE POLICY`, and never use
+              destructive statements (DROP/DELETE/TRUNCATE or data-losing type
+              changes). See supabase/migrations/README.md. Do NOT tell the user to
+              run SQL by hand.

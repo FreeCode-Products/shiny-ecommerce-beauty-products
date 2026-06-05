@@ -1,0 +1,68 @@
+name: DB migrations
+
+# Applies pending supabase/migrations/*.sql to the PRODUCTION database after a
+# change lands on main. Runs only when a migration file (or this workflow) changes,
+# and is a clean no-op until the SUPABASE_DB_URL secret is set.
+#
+# Migrations are idempotent + additive-only (see supabase/migrations/README.md),
+# and each is applied in a single transaction with ON_ERROR_STOP, so a bad file
+# rolls back and fails the run instead of half-applying.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - ".github/workflows/migrate.yml"
+
+# Never run two migration passes at once.
+concurrency:
+  group: db-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply pending migrations
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "SUPABASE_DB_URL secret not set — skipping migrations (no-op)."
+            echo "See supabase/migrations/README.md to enable auto-migrations."
+            exit 0
+          fi
+
+          command -v psql >/dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y postgresql-client; }
+
+          shopt -s nullglob
+          files=(supabase/migrations/*.sql)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No migration files found — nothing to apply."
+            exit 0
+          fi
+
+          # Track which migrations have already run.
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -c \
+            "create table if not exists public.schema_migrations (version text primary key, applied_at timestamptz not null default now());"
+
+          for f in "${files[@]}"; do
+            v="$(basename "$f")"
+            applied="$(psql "$SUPABASE_DB_URL" -tAc "select 1 from public.schema_migrations where version = '${v//\'/\'\'}'")"
+            if [ "$applied" = "1" ]; then
+              echo "= already applied: $v"
+              continue
+            fi
+            echo "+ applying: $v"
+            psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 --single-transaction -f "$f"
+            psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -c \
+              "insert into public.schema_migrations(version) values ('${v//\'/\'\'}')"
+            echo "  done: $v"
+          done
+
+          echo "Migrations up to date."

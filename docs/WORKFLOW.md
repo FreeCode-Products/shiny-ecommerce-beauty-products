@@ -5,7 +5,8 @@ work in an issue, let it land on `main` through a pull request, and Vercel deplo
 the result automatically.
 
 ```
-GitHub issue  →  PR on a claude/* branch  →  CI (lint + build)  →  squash-merge to main  →  Vercel deploy
+GitHub issue  →  PR on a claude/* branch  →  CI (lint + build + smoke)  →  squash-merge to main  →  Vercel deploy
+                                                                                                   ↘  DB migrations (if any)
 ```
 
 ## 1. Requesting a change (issue-driven)
@@ -28,10 +29,13 @@ pushes to `main`:
 - `npm ci`
 - `npm run lint`
 - `npm run build` (also runs the TypeScript check)
+- **smoke test** — boots the production server and asserts that `/`, `/shop` and a
+  product page return HTTP 200, so a change that compiles but crashes at runtime
+  fails CI instead of auto-deploying.
 
-The build runs **without secrets** — the app degrades gracefully when env vars are
-absent, so CI never needs production keys. A newer push cancels any in-flight run
-for the same branch (`concurrency`).
+CI runs **without secrets** — the app degrades gracefully when env vars are absent,
+so CI never needs production keys (the smoke test exercises the bundled-catalogue
+fallback). A newer push cancels any in-flight run for the same branch (`concurrency`).
 
 ## 3. Auto-merge
 
@@ -52,13 +56,32 @@ from auto-merge. There is no deploy step inside GitHub Actions; Vercel owns it.
 
 Preview deploys are created automatically for open PRs.
 
+## 5. Database migrations
+
+[`.github/workflows/migrate.yml`](../.github/workflows/migrate.yml) applies any new
+[`supabase/migrations/*.sql`](../supabase/migrations/) to the **production** database
+when they land on `main`. Files are idempotent + additive-only, tracked in
+`public.schema_migrations`, and each runs in a single transaction (a bad file rolls
+back and fails the run). It only runs when a migration file changes, and is a clean
+**no-op until the `SUPABASE_DB_URL` secret is set** (see
+[`supabase/migrations/README.md`](../supabase/migrations/README.md)).
+
+So a schema-changing issue ships end-to-end: Claude adds the migration in the PR →
+CI → merge → the migration applies → Vercel serves the new code.
+
+> **Ordering caveat:** the migration job and Vercel's deploy both start from the
+> same push and run in parallel. Because migrations are **additive-only**, the old
+> and new code both work against the schema during the brief overlap, so order
+> doesn't matter. (Never ship a destructive migration through this path.)
+
 ## Required configuration
 
 **GitHub repository secret**
 
 | Secret | Used by | Purpose |
 | --- | --- | --- |
-| `CLAUDE_CODE_OAUTH_TOKEN` | `claude.yml` | Authorizes the Claude Code action (run `claude setup-token`). Swap for `ANTHROPIC_API_KEY` if preferred. |
+| `CLAUDE_CODE_OAUTH_TOKEN` | `claude.yml`, `claude-auto.yml` | Authorizes the Claude Code action (run `claude setup-token`). Swap for `ANTHROPIC_API_KEY` if preferred. |
+| `SUPABASE_DB_URL` | `migrate.yml` | Postgres connection URI (use the **Session pooler** string, IPv4) so migrations can be auto-applied. Optional — migrations skip until it's set. |
 
 **Vercel project environment variables** (Production + Preview) — see
 [`.env.example`](../.env.example) for the full list:
@@ -82,33 +105,19 @@ Most work — code, components, styling, copy, and the bundled product catalogue
 (`src/data/products.ts`) — is fully hands-off: open an issue → it ships. The
 items below are the exceptions.
 
-| Task | Auto today? | Can it be automated? |
+| Task | Auto? | Notes |
 | --- | --- | --- |
 | Code / UI / copy / config changes | ✅ Yes | Already automated |
 | Bundled catalogue (`src/data/products.ts`) | ✅ Yes | Already automated |
-| **DB schema change** (Supabase tables, columns, RLS) | ❌ Manual — paste SQL from `supabase/` into the Supabase **SQL Editor** | ⚠️ Yes, via an opt-in migrations runner (see below) — has real risk |
-| **New secret / env var** (API key, etc.) | ❌ Manual — add in **Vercel → Settings → Env Vars** (and GitHub secret if CI needs it) | 🚫 No — provisioning prod secrets shouldn't be automated |
-| **DB row data / seeding** (DB-backed products, etc.) | ❌ Manual — `/admin` or SQL | ⚠️ Partly — a seed step could run on deploy |
-| **Provider dashboard settings** (Supabase Auth redirect URLs, Razorpay test→live, custom domain/DNS) | ❌ Manual, one-time | 🚫 No — lives in third-party dashboards |
-| **Correctness / does it actually work** | ⚠️ CI only checks `lint` + `build` | ⚠️ Add tests / a smoke test to CI to raise confidence |
+| **DB schema change** (Supabase tables, columns, RLS) | ✅ Yes | Auto-applied via `migrate.yml` once `SUPABASE_DB_URL` is set (additive-only). |
+| **Correctness / does it actually work** | ✅ Mostly | CI smoke test boots the app + checks key pages. Logic bugs still possible — add more tests per feature. |
+| **DB row data / seeding** | ⚠️ Partly | Manage via `/admin`, or ask for a seed step on deploy. |
+| **New secret / env var** (a *new* API key) | ❌ One-time | Add in **Vercel → Settings → Env Vars**. Provisioning prod secrets shouldn't be automated. |
+| **Provider dashboard settings** (Supabase Auth redirect URLs, custom domain/DNS) | ❌ One-time | Lives in third-party dashboards. |
+| **Razorpay test → live** | ❌ One-time | Requires KYC / business verification — a legal human step. |
 
-### Automating DB schema changes (optional, opt-in)
-
-Schema changes are the one piece of "real" work that recurs. They can be moved
-into the pipeline, but auto-applying DDL to a **production** database without
-review is genuinely risky (a bad migration can lock or drop data). If you want it:
-
-1. Keep versioned migrations as `supabase/migrations/*.sql` (Claude writes these
-   in the PR).
-2. Add one secret — `SUPABASE_DB_URL` (the project's Postgres connection string)
-   — in GitHub.
-3. Add a job that runs on push to `main` and applies pending migrations (Supabase
-   CLI `supabase db push`, or `psql -f`).
-
-Trade-off: with that in place, a schema-changing issue ships end-to-end with no
-manual step — at the cost of unreviewed production DDL. Ask and I'll set it up,
-with additive-only migrations recommended. **Until then, schema changes are the
-one thing you apply by hand** (the PR will call out the exact SQL to run).
+The last three are the only **permanent** manual items, and each is a rare,
+one-time-per-integration setup action rather than recurring work.
 
 ## Product content
 
