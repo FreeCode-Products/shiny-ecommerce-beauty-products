@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, ShoppingBag, User, X } from "lucide-react";
@@ -41,13 +42,19 @@ export function Navbar() {
             : "border border-transparent bg-transparent"
         )}
       >
-        <Link href="/" className="flex items-center gap-2" aria-label="The Soap Company, crafted by shiny home">
-          <span className="grid size-9 place-items-center rounded-full bg-moss text-foam font-display text-lg">
-            S
-          </span>
-          <span className="font-display text-xl font-semibold tracking-tight text-ink">
-            The Soap Company, crafted by shiny
-          </span>
+        <Link
+          href="/"
+          className="flex items-center"
+          aria-label="The Soap Company, crafted by shiny — home"
+        >
+          <Image
+            src="/logo-mark.png"
+            alt="The Soap Company, crafted by shiny"
+            width={440}
+            height={474}
+            priority
+            className="h-10 w-auto"
+          />
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">

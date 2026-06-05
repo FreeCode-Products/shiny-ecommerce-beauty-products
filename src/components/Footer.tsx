@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AtSign, Camera, Leaf, MessageCircle } from "lucide-react";
 
 const columns = [
@@ -38,9 +39,15 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Link href="/" className="flex items-center gap-2">
-              <span className="grid size-9 place-items-center rounded-full bg-foam text-moss font-display text-lg">
-                S
+            <Link href="/" className="flex items-center gap-3">
+              <span className="grid place-items-center rounded-2xl bg-foam p-1.5">
+                <Image
+                  src="/logo-mark.png"
+                  alt="The Soap Company, crafted by shiny"
+                  width={440}
+                  height={474}
+                  className="h-10 w-auto"
+                />
               </span>
               <span className="font-display text-2xl font-semibold">The Soap Company, crafted by shiny</span>
             </Link>
