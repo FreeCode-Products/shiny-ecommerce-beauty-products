@@ -39,3 +39,5 @@ jobs:
           # Uses your Claude subscription token (run `claude setup-token`).
           # Alternatively, swap this for: anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Pin to Opus (model is passed through to the Claude CLI via claude_args).
+          claude_args: "--model claude-opus-4-8"

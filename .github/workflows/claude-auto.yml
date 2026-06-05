@@ -31,6 +31,8 @@ jobs:
         with:
           # Same credential the mention-based workflow uses.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Pin to Opus (model is passed through to the Claude CLI via claude_args).
+          claude_args: "--model claude-opus-4-8"
           # Tag mode + tracking comment, tied to this issue's context.
           track_progress: true
           prompt: |
