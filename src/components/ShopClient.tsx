@@ -61,15 +61,15 @@ export function ShopClient({
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
-          <label htmlFor="sort" className="text-sm text-ink-soft">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <label htmlFor="sort" className="shrink-0 text-sm text-ink-soft">
             Sort
           </label>
           <select
             id="sort"
             value={sort}
             onChange={(e) => setSort(e.target.value as Sort)}
-            className="rounded-full border border-ink/15 bg-foam px-4 py-2 text-sm font-medium text-ink focus:border-ink/40 focus:outline-none"
+            className="w-full rounded-full border border-ink/15 bg-foam px-4 py-2 text-sm font-medium text-ink focus:border-ink/40 focus:outline-none sm:w-auto"
           >
             {sorts.map((s) => (
               <option key={s.key} value={s.key}>

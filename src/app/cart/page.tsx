@@ -78,7 +78,7 @@ export default function CartPage() {
         <ArrowLeft className="size-4" /> Continue shopping
       </Link>
 
-      <h1 className="mt-6 font-display text-5xl font-semibold tracking-tight text-ink">
+      <h1 className="mt-6 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
         Your bag
       </h1>
 
@@ -112,11 +112,11 @@ export default function CartPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0, x: 40 }}
-                    className="flex gap-5 py-6"
+                    className="flex gap-3 py-6 sm:gap-5"
                   >
                     <Link
                       href={`/product/${product.slug}`}
-                      className="size-28 shrink-0 rounded-2xl bg-sand p-3"
+                      className="size-20 shrink-0 rounded-2xl bg-sand p-2.5 sm:size-28 sm:p-3"
                     >
                       <SoapVisual
                         accent={product.accent}
@@ -128,11 +128,11 @@ export default function CartPage() {
                       <div className="flex justify-between gap-4">
                         <div>
                           <Link href={`/product/${product.slug}`}>
-                            <h3 className="font-display text-xl text-ink">{product.name}</h3>
+                            <h3 className="font-display text-base text-ink sm:text-xl">{product.name}</h3>
                           </Link>
                           <p className="text-sm text-ink-soft">{product.scent}</p>
                         </div>
-                        <span className="font-display text-xl text-ink">
+                        <span className="font-display text-base text-ink sm:text-xl">
                           {formatPrice(product.price * quantity)}
                         </span>
                       </div>

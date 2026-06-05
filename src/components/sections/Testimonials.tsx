@@ -72,7 +72,7 @@ export function Testimonials() {
               {reviews.map((r, i) => (
                 <motion.li
                   key={i}
-                  className="flex w-[340px] shrink-0 flex-col rounded-3xl border border-ink/10 bg-cream p-7"
+                  className="flex w-72 shrink-0 flex-col rounded-3xl border border-ink/10 bg-cream p-6 sm:w-[340px] sm:p-7"
                 >
                   <Quote className="size-7" style={{ color: r.accent }} />
                   <p className="mt-4 flex-1 text-lg leading-relaxed text-ink">

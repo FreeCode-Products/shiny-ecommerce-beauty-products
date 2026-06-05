@@ -60,6 +60,7 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Lenis smooth-scroll plumbing */
@@ -80,7 +81,14 @@ html.lenis body {
   color: var(--color-foam);
 }
 
-/* Custom scrollbar */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-rev {
+    animation-play-state: paused;
+  }
+}
+
+/* Custom scrollbar (hidden on touch devices) */
 ::-webkit-scrollbar {
   width: 10px;
 }

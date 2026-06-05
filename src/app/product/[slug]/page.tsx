@@ -72,7 +72,7 @@ export default async function ProductPage({
         <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Visual */}
           <div
-            className="relative grid place-items-center overflow-hidden rounded-[2.5rem] p-12"
+            className="relative grid place-items-center overflow-hidden rounded-[2.5rem] p-6 sm:p-10 lg:p-12"
             style={{
               background: `radial-gradient(120% 120% at 30% 20%, ${product.accent}33 0%, ${product.accent2}22 100%)`,
             }}
@@ -173,7 +173,7 @@ export default async function ProductPage({
         </div>
 
         {/* Full description, ingredients deep-dive, ritual & details */}
-        <div className="mt-20 grid grid-cols-1 gap-12 border-t border-ink/10 pt-14 lg:grid-cols-3 lg:gap-16">
+        <div className="mt-12 grid grid-cols-1 gap-12 border-t border-ink/10 pt-10 sm:mt-20 sm:pt-14 lg:grid-cols-3 lg:gap-16">
           <div className="flex flex-col gap-12 lg:col-span-2">
             {product.longDescription && product.longDescription.length > 0 && (
               <section>
@@ -280,8 +280,8 @@ export default async function ProductPage({
         <Reviews productSlug={product.slug} />
 
         {/* Related */}
-        <section className="mt-24 pb-24">
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-ink">
+        <section className="mt-16 pb-20 sm:mt-24 sm:pb-24">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
             You may also like
           </h2>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">

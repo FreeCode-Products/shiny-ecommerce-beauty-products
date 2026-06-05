@@ -36,7 +36,7 @@ export function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
         className={cn(
-          "pointer-events-auto mx-auto mt-3 flex max-w-7xl items-center justify-between gap-6 rounded-full px-5 py-3 transition-all duration-500 sm:mx-4 lg:mx-auto",
+          "pointer-events-auto mx-3 mt-3 flex max-w-7xl items-center justify-between gap-4 rounded-full px-4 py-3 transition-all duration-500 sm:mx-4 sm:gap-6 sm:px-5 lg:mx-auto",
           scrolled
             ? "border border-ink/10 bg-foam/80 shadow-[0_8px_30px_-12px_rgba(31,26,20,0.25)] backdrop-blur-xl"
             : "border border-transparent bg-transparent"

@@ -30,7 +30,7 @@ export function Categories() {
             >
               <Link
                 href={`/shop?category=${cat.key}`}
-                className="group relative flex h-72 flex-col justify-end overflow-hidden rounded-3xl p-6 text-foam"
+                className="group relative flex h-52 flex-col justify-end overflow-hidden rounded-3xl p-6 text-foam sm:h-64 lg:h-72"
                 style={{ backgroundColor: cat.accent }}
               >
                 <div

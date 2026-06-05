@@ -37,7 +37,7 @@ export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-moss text-foam">
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-20">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-12">
           <div>
             <Link href="/" className="flex items-center gap-3">
               <span className="grid place-items-center rounded-2xl bg-foam p-1.5">
@@ -49,7 +49,7 @@ export function Footer() {
                   className="h-10 w-auto"
                 />
               </span>
-              <span className="font-display text-2xl font-semibold">The Soap Company, crafted by shiny</span>
+              <span className="font-display text-lg font-semibold sm:text-2xl">The Soap Company, crafted by shiny</span>
             </Link>
             <p className="mt-1 text-xs text-foam/50">A soap company by Shiny</p>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-foam/70">

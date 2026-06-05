@@ -24,7 +24,7 @@ export default async function ShopPage({
         <p className="text-sm font-medium uppercase tracking-widest text-clay">
           The collection
         </p>
-        <h1 className="mt-3 font-display text-5xl font-semibold leading-tight tracking-tight text-ink sm:text-6xl">
+        <h1 className="mt-3 font-display text-4xl font-semibold leading-tight tracking-tight text-ink sm:text-5xl lg:text-6xl">
           Every bar, hand-cured.
         </h1>
         <p className="mt-4 text-lg text-ink-soft">

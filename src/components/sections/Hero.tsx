@@ -33,8 +33,8 @@ export function Hero() {
       className="grain relative min-h-screen overflow-hidden bg-gradient-to-b from-cream via-cream to-sand pt-28"
     >
       {/* ambient colour blobs */}
-      <div className="pointer-events-none absolute -left-32 top-20 size-96 rounded-full bg-clay/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 bottom-10 size-96 rounded-full bg-sage/30 blur-3xl" />
+      <div className="pointer-events-none absolute -left-16 top-20 size-64 rounded-full bg-clay/20 blur-3xl sm:-left-32 sm:size-96" />
+      <div className="pointer-events-none absolute -right-12 bottom-10 size-64 rounded-full bg-sage/30 blur-3xl sm:-right-24 sm:size-96" />
 
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-6 px-6 lg:grid-cols-2 lg:gap-10">
         {/* Copy */}
@@ -91,7 +91,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.1 }}
-            className="mt-10 flex items-center gap-6 text-sm text-ink-soft"
+            className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-ink-soft"
           >
             <div>
               <p className="font-display text-2xl text-ink">40k+</p>
