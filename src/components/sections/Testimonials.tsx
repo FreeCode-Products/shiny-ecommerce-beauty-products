@@ -7,38 +7,38 @@ import { Reveal } from "@/components/ui/Reveal";
 const reviews = [
   {
     quote:
-      "The Midnight Charcoal bar completely changed my skin. My pores look smaller and it lasts forever.",
+      "The Midnight Detox bar completely changed my skin. My pores look clearer and the tea tree scent is so fresh.",
     name: "Amara O.",
     detail: "Verified buyer · Detox",
     accent: "#3a3f44",
   },
   {
     quote:
-      "Lavender Dream is my nightly ritual now. The scent is real lavender — not that fake purple stuff.",
+      "Dew Ritual is the only face wash that doesn't leave my sensitive skin feeling tight. So gentle and calming.",
     name: "Priya S.",
     detail: "Verified buyer · Calm",
-    accent: "#9a86c4",
+    accent: "#8975b3",
   },
   {
     quote:
-      "Citrus Zest wakes me up better than coffee. The whole bathroom smells like an orange grove.",
+      "Solar Bloom wakes me up better than coffee — the lemongrass and lemon scent is unreal in the morning.",
     name: "Marcus L.",
     detail: "Verified buyer · Energize",
-    accent: "#f0a23a",
+    accent: "#ecc94b",
   },
   {
     quote:
-      "Finally a soap that doesn't dry out my sensitive skin. The Oatmeal & Honey bar is pure comfort.",
+      "Coco Crème lathers like a dream and smells like a tropical holiday. My skin feels soft for hours after.",
     name: "Hana K.",
     detail: "Verified buyer · Nourish",
-    accent: "#caa15f",
+    accent: "#c2a062",
   },
   {
     quote:
-      "Beautiful packaging, zero plastic, and the bars are gorgeous. I gift these constantly.",
+      "Beautiful packaging, zero plastic, and Rose Reverie is gorgeous. I gift these handcrafted bars constantly.",
     name: "Diego R.",
-    detail: "Verified buyer · Gift set",
-    accent: "#69b59a",
+    detail: "Verified buyer · Gift",
+    accent: "#e6a0a8",
   },
 ];
 

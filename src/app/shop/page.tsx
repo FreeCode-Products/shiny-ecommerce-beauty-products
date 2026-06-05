@@ -5,7 +5,7 @@ import { getAllProducts } from "@/lib/products";
 export const metadata: Metadata = {
   title: "Shop all soaps",
   description:
-    "Browse the full Saponé collection of handmade botanical soap bars — detox, calm, energize and nourish.",
+    "Browse the full collection of handmade botanical soap bars from The Soap Company, crafted by shiny — detox, calm, energize and nourish.",
 };
 
 export const revalidate = 60;
@@ -28,8 +28,8 @@ export default async function ShopPage({
           Every bar, hand-cured.
         </h1>
         <p className="mt-4 text-lg text-ink-soft">
-          Eight botanical blends, each cold-processed and cured for six weeks.
-          Find the one your skin has been waiting for.
+          Ten handcrafted shea butter soaps and four botanical face washes,
+          each blended by hand. Find the one your skin has been waiting for.
         </p>
       </header>
 

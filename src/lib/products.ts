@@ -1,6 +1,7 @@
 import {
   products as fallbackProducts,
   categories,
+  featuredSlugs,
   type Product,
   type ProductCategory,
 } from "@/data/products";
@@ -91,6 +92,5 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
     if (data && data.length > 0) return (data as ProductRow[]).map(rowToProduct).slice(0, limit);
   }
   // Fallback: first matching from the bundled catalogue.
-  const featuredSlugs = ["charcoal-detox", "lavender-dream", "citrus-zest", "rose-petal"];
   return fallbackProducts.filter((p) => featuredSlugs.includes(p.slug)).slice(0, limit);
 }

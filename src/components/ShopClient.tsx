@@ -81,7 +81,7 @@ export function ShopClient({
       </div>
 
       <p className="mt-6 text-sm text-ink-soft">
-        Showing {visible.length} {visible.length === 1 ? "soap" : "soaps"}
+        Showing {visible.length} {visible.length === 1 ? "product" : "products"}
       </p>
 
       <motion.div
