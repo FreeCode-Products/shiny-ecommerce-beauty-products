@@ -26,8 +26,8 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL("https://sapone.example.com"),
   title: {
-    default: "Saponé — Handcrafted Botanical Soap",
-    template: "%s · Saponé",
+    default: "The Soap Company, crafted by shiny — Handcrafted Botanical Soap",
+    template: "%s · The Soap Company, crafted by shiny",
   },
   description:
     "Small-batch botanical soap, hand-cut and cured for six weeks. Vegan, cruelty-free and plastic-free bars for every kind of skin.",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     "cold process soap",
   ],
   openGraph: {
-    title: "Saponé — Handcrafted Botanical Soap",
+    title: "The Soap Company, crafted by shiny — Handcrafted Botanical Soap",
     description:
       "Small-batch botanical soap, hand-cut and cured for six weeks. Vegan, cruelty-free and plastic-free.",
     type: "website",

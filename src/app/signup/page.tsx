@@ -4,7 +4,7 @@ import { AuthForm } from "@/components/auth/AuthForm";
 
 export const metadata: Metadata = {
   title: "Create account",
-  description: "Create your Saponé account to track orders and leave reviews.",
+  description: "Create your account at The Soap Company, crafted by shiny to track orders and leave reviews.",
 };
 
 export default function SignupPage() {

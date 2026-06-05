@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Leaf, Recycle, Sprout } from "lucide-react";
 
 const paragraph =
-  "We began in a small kitchen with a single pot, a stack of botanical oils and a stubborn belief that everyday soap could be beautiful. Today, every Saponé bar is still made the slow way — by hand, in tiny batches, cured for six patient weeks.";
+  "We began in a small kitchen with a single pot, a stack of botanical oils and a stubborn belief that everyday soap could be beautiful. Today, every bar from The Soap Company, crafted by shiny is still made the slow way — by hand, in tiny batches, cured for six patient weeks.";
 
 const pillars = [
   { icon: Leaf, label: "100% botanical" },

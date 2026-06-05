@@ -4,7 +4,7 @@ import { AuthForm } from "@/components/auth/AuthForm";
 
 export const metadata: Metadata = {
   title: "Log in",
-  description: "Log in to your Saponé account.",
+  description: "Log in to your account at The Soap Company, crafted by shiny.",
 };
 
 export default function LoginPage() {

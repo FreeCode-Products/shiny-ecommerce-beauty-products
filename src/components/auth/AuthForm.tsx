@@ -82,8 +82,8 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         </h1>
         <p className="mt-2 text-sm text-ink-soft">
           {isSignup
-            ? "Join Saponé to track orders and leave reviews."
-            : "Log in to your Saponé account."}
+            ? "Join The Soap Company, crafted by shiny to track orders and leave reviews."
+            : "Log in to your account at The Soap Company, crafted by shiny."}
         </p>
 
         {!configured && (
@@ -173,7 +173,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         )}
 
         <p className="mt-6 text-center text-sm text-ink-soft">
-          {isSignup ? "Already have an account? " : "New to Saponé? "}
+          {isSignup ? "Already have an account? " : "New to The Soap Company, crafted by shiny? "}
           <Link
             href={isSignup ? "/login" : "/signup"}
             className="font-medium text-clay hover:underline"

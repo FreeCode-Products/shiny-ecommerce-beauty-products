@@ -42,7 +42,7 @@ export function Footer() {
               <span className="grid size-9 place-items-center rounded-full bg-foam text-moss font-display text-lg">
                 S
               </span>
-              <span className="font-display text-2xl font-semibold">Saponé</span>
+              <span className="font-display text-2xl font-semibold">The Soap Company, crafted by shiny</span>
             </Link>
             <p className="mt-1 text-xs text-foam/50">A soap company by Shiny</p>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-foam/70">
@@ -86,7 +86,7 @@ export function Footer() {
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-foam/15 pt-8 text-sm text-foam/60 sm:flex-row">
           <p className="flex items-center gap-2">
-            <Leaf className="size-4" /> © {new Date().getFullYear()} Saponé. Made with care.
+            <Leaf className="size-4" /> © {new Date().getFullYear()} The Soap Company, crafted by shiny. Made with care.
           </p>
           <p>Vegan · Cruelty-free · Plastic-free</p>
         </div>
@@ -95,7 +95,7 @@ export function Footer() {
       {/* oversized wordmark */}
       <div className="pointer-events-none select-none px-6">
         <p className="-mb-6 bg-gradient-to-b from-foam/10 to-transparent bg-clip-text text-center font-display text-[18vw] font-semibold leading-none text-transparent">
-          Saponé
+          The Soap Company, crafted by shiny
         </p>
       </div>
     </footer>

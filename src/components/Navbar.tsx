@@ -41,12 +41,12 @@ export function Navbar() {
             : "border border-transparent bg-transparent"
         )}
       >
-        <Link href="/" className="flex items-center gap-2" aria-label="Saponé home">
+        <Link href="/" className="flex items-center gap-2" aria-label="The Soap Company, crafted by shiny home">
           <span className="grid size-9 place-items-center rounded-full bg-moss text-foam font-display text-lg">
             S
           </span>
           <span className="font-display text-xl font-semibold tracking-tight text-ink">
-            Saponé
+            The Soap Company, crafted by shiny
           </span>
         </Link>
 

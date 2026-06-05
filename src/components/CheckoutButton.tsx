@@ -80,7 +80,7 @@ export function CheckoutButton({
         key: data.keyId,
         amount: data.amount,
         currency: data.currency,
-        name: "Saponé",
+        name: "The Soap Company, crafted by shiny",
         description: "Botanical soap order",
         order_id: data.orderId,
         prefill: data.prefill ?? { email: user?.email ?? undefined },

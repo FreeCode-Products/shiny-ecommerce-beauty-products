@@ -59,7 +59,7 @@ export default function CartPage() {
           Order placed!
         </h1>
         <p className="mt-3 text-ink-soft">
-          Thank you for choosing Saponé. This is a demo store, so no payment was
+          Thank you for choosing The Soap Company, crafted by shiny. This is a demo store, so no payment was
           taken — but your imaginary soaps are on their way. 🧼
         </p>
         <Button href="/shop" size="lg" className="mt-8">
