@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import Razorpay from "razorpay";
 import { getAllProducts } from "@/lib/products";
-import { createSupabaseServerClient, getCurrentUser } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   FREE_SHIP_AT,
   RAZORPAY_KEY_ID,
@@ -38,18 +40,14 @@ function validShipping(s: Shipping | undefined): string | null {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createSupabaseServerClient();
-
   // Pure demo (no Supabase + no Razorpay): nothing to persist — let the client
   // show a demo confirmation.
-  if (!supabase && !isRazorpayConfigured) {
+  if (!isSupabaseConfigured && !isRazorpayConfigured) {
     return NextResponse.json({ mode: "demo" }, { status: 503 });
   }
 
+  // Guest checkout is allowed — user may be null.
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Please log in to check out." }, { status: 401 });
-  }
 
   const body = (await request.json().catch(() => null)) as
     | { items?: IncomingItem[]; shipping?: Shipping }
@@ -93,8 +91,8 @@ export async function POST(request: NextRequest) {
   };
 
   const baseOrder = {
-    user_id: user.id,
-    email: user.email,
+    user_id: user?.id ?? null,
+    email: user?.email ?? null,
     phone: ship.phone!.trim(),
     shipping_address,
     items: snapshot,
@@ -119,9 +117,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Could not start payment." }, { status: 502 });
     }
 
+    const adminDb = createSupabaseAdminClient();
     let dbOrderId: string | null = null;
-    if (supabase) {
-      const { data } = await supabase
+    if (adminDb) {
+      const { data } = await adminDb
         .from("orders")
         .insert({ ...baseOrder, status: "created", razorpay_order_id: rzpOrderId })
         .select("id")
@@ -136,12 +135,20 @@ export async function POST(request: NextRequest) {
       currency: "INR",
       keyId: RAZORPAY_KEY_ID,
       dbOrderId,
-      prefill: { name: shipping_address.name, contact: baseOrder.phone, email: user.email },
+      prefill: {
+        name: shipping_address.name,
+        contact: baseOrder.phone,
+        email: user?.email ?? undefined,
+      },
     });
   }
 
   // --- Cash on delivery path (Razorpay not configured yet) -----------------
-  const { error } = await supabase!
+  const adminDb = createSupabaseAdminClient();
+  if (!adminDb) {
+    return NextResponse.json({ error: "Service not configured." }, { status: 503 });
+  }
+  const { error } = await adminDb
     .from("orders")
     .insert({ ...baseOrder, status: "created" });
 

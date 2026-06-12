@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { RAZORPAY_KEY_SECRET, isRazorpayConfigured } from "@/lib/razorpay/config";
 
 export const runtime = "nodejs";
@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
     expected.length === razorpay_signature.length &&
     crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(razorpay_signature));
 
-  // Reflect the result on the saved order (best-effort).
-  const supabase = await createSupabaseServerClient();
-  if (supabase) {
-    await supabase
+  // Reflect the result on the saved order (best-effort, admin client bypasses RLS for guest orders).
+  const adminDb = createSupabaseAdminClient();
+  if (adminDb) {
+    await adminDb
       .from("orders")
       .update({
         status: valid ? "paid" : "failed",

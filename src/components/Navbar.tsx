@@ -71,16 +71,16 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <Link
-            href={user ? "/account" : "/login"}
-            aria-label={user ? "Your account" : "Log in"}
-            className="relative grid size-11 place-items-center rounded-full bg-ink/5 text-ink transition-colors hover:bg-ink/10"
-          >
-            <User className="size-5" />
-            {user && (
+          {user && (
+            <Link
+              href="/account"
+              aria-label="Your account"
+              className="relative grid size-11 place-items-center rounded-full bg-ink/5 text-ink transition-colors hover:bg-ink/10"
+            >
+              <User className="size-5" />
               <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-sage ring-2 ring-cream" />
-            )}
-          </Link>
+            </Link>
+          )}
           <button
             onClick={openCart}
             aria-label="Open cart"
