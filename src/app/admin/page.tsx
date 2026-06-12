@@ -6,7 +6,6 @@ import { getCurrentUser } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isAdminEmail } from "@/lib/admin";
 import { AdminDashboard, type AdminOrder } from "@/components/admin/AdminDashboard";
-import { ProductsManager } from "@/components/admin/ProductsManager";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
@@ -71,7 +70,7 @@ export default async function AdminPage() {
   const { data } = await admin
     .from("orders")
     .select(
-      "id, email, phone, shipping_address, user_id, items, subtotal, shipping, total, status, created_at"
+      "id, email, phone, shipping_address, user_id, items, subtotal, shipping, total, status, razorpay_order_id, razorpay_payment_id, created_at"
     )
     .order("created_at", { ascending: false });
 
@@ -97,7 +96,6 @@ export default async function AdminPage() {
       </header>
 
       <AdminDashboard initialOrders={orders} products={products} />
-      <ProductsManager initialProducts={products} />
     </div>
   );
 }
